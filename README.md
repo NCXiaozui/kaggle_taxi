@@ -48,23 +48,23 @@ n is the total number of observations in the (public/private) data set,
     在训练集中，有乘客数竟然大于9，最小的是0，而乘车的时间也存在问题，有的时间只有1秒，长的竟然有`$3.52 * 10^6$`，这些明显不正常的值到时候肯定是要剔除的。
    - ### 乘车时间统计分布：
         ![image](http://ww3.sinaimg.cn/large/0060lm7Tly1fjbdw5k8mjj30e509jt8p.jpg)
-        ![image](http://ww4.sinaimg.cn/large/0060lm7Tly1fjbdwn2wxfj30e509j0sq.jpg)
+        ![image](http://ww4.sinaimg.cn/large/0060lm7Tly1fjbdwn2wxfj30e509j0sq.jpg)   
         可以看出一开始的数据是服从幂律分布的，主要集中在0〜2000。然后我们就可以取对数，服从一个高斯分布。**后面训练的时候我们也用取对数的情况。因为很多时候我们都是假定数据是服从正态分布的**。
     - ### 日期乘车数量统计：
       这里统计的是训练集和测试集在时间在的车量变化。
       ![image](http://ww1.sinaimg.cn/large/0060lm7Tly1fjbe6q3s88j30dm095t9e.jpg)
       ***这里我们可以看出来在这个指标上面，集练集和测试集是趋势一致的。这可以假设是说明其实测试数据和训练数据是分布一致的，这也为后面抽cv提供了依据。***
     - ### 司机平均时间：
-      这里统计的是不同司机所用的时间。
-      ![image](http://ww3.sinaimg.cn/large/0060lm7Tly1fjbf9gm5rpj30du09xjrd.jpg)
+      这里统计的是不同司机所用的时间。   
+      ![image](http://ww3.sinaimg.cn/large/0060lm7Tly1fjbf9gm5rpj30du09xjrd.jpg)   
    这里可以看到，司机不同，花费的时间还是有一定的差距的。一般来说，2比1花的时间更多。
     - ### 乘客数量与时间的关系：
       这里我们考查的是看乘客数量与所用时间的关系。**(特别说明一下，这里我已经把异常值舍弃了。）**
-      ![image](http://ww1.sinaimg.cn/large/0060lm7Tly1fjbfczxk4tj30ry0gqwej.jpg)
+      ![image](http://ww1.sinaimg.cn/large/0060lm7Tly1fjbfczxk4tj30ry0gqwej.jpg)   
       其实在这里就可以发现,乘客的数量与用时其实并没有多大的关系。
     - ### **乘车地点：**
       这里我主要是想看一下训练集与测试集在地点上（经纬度）的关系。
-      ![image](http://ww2.sinaimg.cn/large/0060lm7Tly1fjbfmfn26vj30eo0angn2.jpg)
+      ![image](http://ww2.sinaimg.cn/large/0060lm7Tly1fjbfmfn26vj30eo0angn2.jpg)   
       这里可以进一步证明我们上次的观点就是训练集和测试集是同分布。为我们后面直接从训练集里面分数据提供了证据支撑。
 ## **特征工程**
   - 时间处理     
