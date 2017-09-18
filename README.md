@@ -27,11 +27,17 @@
 - pickup_latitude - the latitude where the meter was engaged
 - dropoff_longitude - the longitude where the meter was disengaged
 - dropoff_latitude - the latitude where the meter was disengaged
-- store_and_fwd_flag - This flag indicates whether the trip record was held in vehicle memory before sending to the vendor because the vehicle did not have a connection to the server - Y=store and forward; N=not a store and forward trip
+- store\_and\_fwd_flag - This flag indicates whether the trip record was held in vehicle memory before sending to the vendor because the vehicle did not have a connection to the server - Y=store and forward; N=not a store and forward trip
 - trip_duration - duration of the trip in seconds  
 然后测试集没有了'trip_duration'。
 ## 任务描述：
-  预测测试集的乘车时间。
+  预测测试集的乘车时间。   
+  **评价标准(RMSLE)：**`$\epsilon = \sqrt{\frac{1}{n} \sum_{i=1}^n (\log(p_i + 1) - \log(a_i+1))^2 }$`   
+`$\epsilon$` is the RMSLE value (score)  
+n is the total number of observations in the (public/private) data set,
+`$p_i$` is your prediction of trip duration, and
+`$a_i$` is the actual trip duration for `$i$`.    
+`$\log(x)$` is the natural logarithm of `$x$`
 ## 数据统计与可视化：
    - ### 数据统计：
 这里主要是看最小值和最大值，因为这样可以看出是否存在有异常点，可以为后面消除异常点提供帮助。    
@@ -43,7 +49,7 @@
    - ### 乘车时间统计分布：
         ![image](http://ww3.sinaimg.cn/large/0060lm7Tly1fjbdw5k8mjj30e509jt8p.jpg)
         ![image](http://ww4.sinaimg.cn/large/0060lm7Tly1fjbdwn2wxfj30e509j0sq.jpg)
-        可以看出一开始的数据是服从冥律分布的，主要集中在0〜2000。然后我们就可以取对数，服从一个高斯分布。**后面训练的时候我们也用取对数的情况。因为很多时候我们都是假定数据是服从正态分布的**。
+        可以看出一开始的数据是服从幂律分布的，主要集中在0〜2000。然后我们就可以取对数，服从一个高斯分布。**后面训练的时候我们也用取对数的情况。因为很多时候我们都是假定数据是服从正态分布的**。
     - ### 日期乘车数量统计：
       这里统计的是训练集和测试集在时间在的车量变化。
       ![image](http://ww1.sinaimg.cn/large/0060lm7Tly1fjbe6q3s88j30dm095t9e.jpg)
@@ -64,9 +70,20 @@
   - 时间处理     
  这里我将时间这个特征分为月，天，小时，还有星期几这个几个特征，并且后面使用one-hot编码。这样做的原因是因为时间这个数字是一个周期性的数值，其本身是没有数值大小概念的，所以为了防止模型错误理解这个特征意义，我将其进行one-hot编码。当然，这也可能会维度的增加，但是因为它数据本身特征并不多，所以这个问题暂时不用考虑。
   - 距离处理  
-  乘车时间很容易想到与距离有关系，因为按照经验来说，我们会很自然想到时间与距离是成正比的。但是我们现有的数据并没有直接给出距离的特征，这里我们可以利用起点经纬度和终点经纬度，进行计算。（这里我最开始用的是直接用经纬度算，但是后面看介绍的是有特写的公司算的，所以后面就改了。）算距离也有两个指标，一个是欧氏距离，一个是曼哈顿距离，这两个我都计算了，还有计算方向。
+  乘车时间很容易想到与距离有关系，因为按照经验来说，我们会很自然想到时间与距离是成正比的。但是我们现有的数据并没有直接给出距离的特征，这里我们可以利用起点经纬度和终点经纬度，进行计算。算距离有两个指标，一个是欧氏距离，一个是曼哈顿距离，还增加了一个方向。
  - 位置信息处理：   
  这里我用了kmeans聚类，将这些距离进行了一个聚类。我开始不是很明白为什么会这样做，但是后面我的理解是在同一个区域，那么它们的路况信息什么的都是比较接近的，二来也是增加了数据的特征，减少数据稀疏性（在经纬度上）。
 ## 模型预测：
 这里选用的是xgboost。
+xgboost的相关知识介绍可以参考：
+>http://blog.csdn.net/sb19931201/article/details/52557382   
+- 一般调参数的方法：
+在过拟合情况：
+  - 可以控制模型复杂度：
+  调节max_depth,min_child_weight等
+  - 可以增加训练集的随机性：
+  调节subsample,colsample\_bytree，也可以调节eta（学习速率），但是也要增加num\_round
+具体调参过程可以参考： http://xgboost.readthedocs.io/en/latest/how_to/param_tuning.html
+- 训练过程
+![image](http://ww2.sinaimg.cn/large/0060lm7Tly1fjnqhl73u9j30n40vmjz1.jpg)
     
